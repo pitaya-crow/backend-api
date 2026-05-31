@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class HomeService {
@@ -24,5 +26,16 @@ public class HomeService {
         data.put("borrowCount",borrowRecordMapper.countTotalBorrows());
         data.put("countUsers",userMapper.countUsers());
         return data;
+    }
+
+    public List<Map<String, Object>> getHotBooks() {
+        return bookMapper.findHotBooksTop8().stream().map(book -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", book.getId());
+            map.put("title", book.getTitle());
+            map.put("author", book.getAuthor());
+            map.put("borrowCount", book.getBorrowCount());
+            return map;
+        }).collect(Collectors.toList());
     }
 }

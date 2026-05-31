@@ -28,6 +28,9 @@ public interface BookMapper {
     @Select("SELECT * FROM book ORDER BY borrow_count DESC LIMIT 10")
     List<Book> getHotBooks();
 
+    @Select("SELECT id, title, author, borrow_count FROM book ORDER BY borrow_count DESC LIMIT 8")
+    List<Book> findHotBooksTop8();
+
     @Select("SELECT * FROM book ORDER BY rating DESC LIMIT 10")
     List<Book> findRatingTop10();
 

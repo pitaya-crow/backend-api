@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.common.Result;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
+import com.example.demo.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,11 +28,16 @@ public class LoginController {
         User user = userService.login(userName, password);
 
         if (user != null) {
+            String role = getRoleByUser(user);
+            String token = JwtUtil.generateToken(user.getPersonId(), user.getUserName(), role);
+            
             result.put("code", 200);
             result.put("msg", "登录成功");
             Map<String, Object> data = new HashMap<>();
-            data.put("userName", user.getUserName());
             data.put("personId", user.getPersonId());
+            data.put("userName", user.getUserName());
+            data.put("token", token);
+            data.put("role", role);
             result.put("data", data);
         } else {
             result.put("code", 401);
@@ -40,10 +46,19 @@ public class LoginController {
 
         return result;
     }
+    
+    private String getRoleByUser(User user) {
+        if (user != null && "admin".equals(user.getUserName())) {
+            return "ADMIN";
+        }
+        return "USER";
+    }
+    
     @PostMapping("/register")
     public Result register(@RequestBody User user){
         return Result.success(userService.register(user));
     }
+    
     @PostMapping("/logout")
     public Result logout(@RequestBody Map<String,String>params){
         String userId= params.get("userId");

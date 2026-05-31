@@ -16,4 +16,9 @@ public class HomeController {
     public Result getStats(){
         return Result.success(homeService.getStats());
     }
+
+    @GetMapping("/hot-books")
+    public Result getHotBooks(){
+        return Result.success(homeService.getHotBooks());
+    }
 }
