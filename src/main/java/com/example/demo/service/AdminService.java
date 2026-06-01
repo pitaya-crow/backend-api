@@ -45,6 +45,9 @@ public List<User> listUsers(int page,int pageSize){
 int offset=(page-1)*pageSize;
 return userMapper.findUserByPage(pageSize,offset);
 }
+public List<User> searchUsers(String keyword){
+    return userMapper.searchByKeyword(keyword);
+}
 public Map<String,Object> getUserStats(){
         Map<String,Object> data= new HashMap<>();
         data.put("totalUsers",userMapper.countUsers());

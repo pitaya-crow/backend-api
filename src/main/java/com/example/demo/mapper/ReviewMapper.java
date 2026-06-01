@@ -25,6 +25,9 @@ public interface ReviewMapper {
     @Select("SELECT * FROM review WHERE book_id = #{bookId} ORDER BY create_time DESC")
     List<Review> findByBookId(Integer bookId);
 
+    @Select("SELECT * FROM review WHERE user_id = #{userId} ORDER BY create_time DESC")
+    List<Review> findByUserId(Integer userId);
+
     @Update("UPDATE review SET content=#{content}, rating=#{rating} WHERE review_id=#{reviewId}")
     int update(Review review);
 

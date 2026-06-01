@@ -3,10 +3,12 @@ package com.example.demo.service;
 import com.example.demo.entity.Review;
 import com.example.demo.entity.ReviewLike;
 import com.example.demo.entity.ReviewReplay;
+import com.example.demo.entity.User;
 import com.example.demo.mapper.BookMapper;
 import com.example.demo.mapper.ReviewLikeMapper;
 import com.example.demo.mapper.ReviewMapper;
 import com.example.demo.mapper.ReviewReplayMapper;
+import com.example.demo.mapper.UserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,15 +24,18 @@ public class ReviewService {
     private final BookMapper bookMapper;
     private final ReviewLikeMapper reviewLikeMapper;
     private final ReviewReplayMapper reviewReplayMapper;
+    private final UserMapper userMapper;
 
     public ReviewService(ReviewMapper reviewMapper,
                          BookMapper bookMapper,
                          ReviewLikeMapper reviewLikeMapper,
-                         ReviewReplayMapper reviewReplayMapper) {
+                         ReviewReplayMapper reviewReplayMapper,
+                         UserMapper userMapper) {
         this.reviewMapper = reviewMapper;
         this.bookMapper = bookMapper;
         this.reviewLikeMapper = reviewLikeMapper;
         this.reviewReplayMapper = reviewReplayMapper;
+        this.userMapper = userMapper;
     }
 
     /** 新增书评 */
@@ -94,12 +99,35 @@ public class ReviewService {
         return true;
     }
 
-    /** 某本书下的书评列表 */
+    /** 某本书下的书评列表（填充用户名） */
     public List<Review> listByBookId(Integer bookId) {
         if (bookId == null) {
             throw new IllegalArgumentException("bookId 不能为空");
         }
-        return reviewMapper.findByBookId(bookId);
+        List<Review> reviews = reviewMapper.findByBookId(bookId);
+        fillUsername(reviews);
+        return reviews;
+    }
+
+    /** 某用户的书评列表（填充用户名） */
+    public List<Review> listByUserId(Integer userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("userId 不能为空");
+        }
+        List<Review> reviews = reviewMapper.findByUserId(userId);
+        fillUsername(reviews);
+        return reviews;
+    }
+
+    private void fillUsername(List<Review> reviews) {
+        for (Review review : reviews) {
+            if (review.getUserId() != null) {
+                User user = userMapper.findById(review.getUserId());
+                if (user != null) {
+                    review.setUsername(user.getUserName());
+                }
+            }
+        }
     }
 
     /**

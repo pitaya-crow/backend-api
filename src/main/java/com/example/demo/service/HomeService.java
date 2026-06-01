@@ -24,7 +24,9 @@ public class HomeService {
         Map<String,Object> data=new HashMap<>();
         data.put("bookCount",bookMapper.countBooks());
         data.put("borrowCount",borrowRecordMapper.countTotalBorrows());
-        data.put("countUsers",userMapper.countUsers());
+        int totalUsers = userMapper.countUsers();
+        data.put("userCount", Math.max(totalUsers - 1, 0)); // 排除管理员
+        data.put("countUsers", totalUsers);
         return data;
     }
 
@@ -35,6 +37,7 @@ public class HomeService {
             map.put("title", book.getTitle());
             map.put("author", book.getAuthor());
             map.put("borrowCount", book.getBorrowCount());
+            map.put("rating", book.getRating());
             return map;
         }).collect(Collectors.toList());
     }

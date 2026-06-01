@@ -15,32 +15,35 @@ import java.util.Map;
 
 @Mapper
 public interface BookMapper {
-    @Select("SELECT * FROM book")
+    // 统一使用显式列名，避免 SELECT * 的列映射问题
+    String BOOK_COLUMNS = "id, title, author, isbn, total, available, create_time, rating, category, borrow_count, publisher, publish_date, description, cover_url";
+
+    @Select("SELECT " + BOOK_COLUMNS + " FROM book")
     List<Book> findALL();
 
-    @Select("SELECT id,title, author, isbn, total, available, create_time, rating ,category,borrow_count FROM book WHERE id = #{id}")
+    @Select("SELECT " + BOOK_COLUMNS + " FROM book WHERE id = #{id}")
     Book findById(Integer id);
 
-
-    @Select("SELECT * FROM book ORDER BY borrow_count DESC LIMIT 10")
+    @Select("SELECT " + BOOK_COLUMNS + " FROM book ORDER BY borrow_count DESC LIMIT 10")
     List<Book> findBorrowTop10();
 
-    @Select("SELECT * FROM book ORDER BY borrow_count DESC LIMIT 10")
+    @Select("SELECT " + BOOK_COLUMNS + " FROM book ORDER BY borrow_count DESC LIMIT 10")
     List<Book> getHotBooks();
 
-    @Select("SELECT id, title, author, borrow_count FROM book ORDER BY borrow_count DESC LIMIT 8")
+    @Select("SELECT id, title, author, borrow_count, rating FROM book ORDER BY borrow_count DESC LIMIT 8")
     List<Book> findHotBooksTop8();
 
-    @Select("SELECT * FROM book ORDER BY rating DESC LIMIT 10")
+    @Select("SELECT " + BOOK_COLUMNS + " FROM book ORDER BY rating DESC LIMIT 10")
     List<Book> findRatingTop10();
 
-    @Insert("INSERT INTO book(title, author, isbn, total, available, create_time,category,borrow_count) " +
-            "VALUES(#{title}, #{author}, #{isbn}, #{total}, #{available}, #{createTime}, #{category},#{borrowCount}")
+    @Insert("INSERT INTO book(title, author, isbn, total, available, create_time, category, borrow_count, publisher, publish_date, description, cover_url) " +
+            "VALUES(#{title}, #{author}, #{isbn}, #{total}, #{available}, #{createTime}, #{category}, #{borrowCount}, #{publisher}, #{publishDate}, #{description}, #{coverUrl})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Book book);
 
     @Update("UPDATE book SET title=#{title}, author=#{author}, isbn=#{isbn}, total=#{total}, " +
-            "available=#{available}, create_time=#{createTime}, category=#{category},borrow_count=#{borrowCount} WHERE id=#{id}")
+            "available=#{available}, create_time=#{createTime}, category=#{category}, borrow_count=#{borrowCount}, " +
+            "publisher=#{publisher}, publish_date=#{publishDate}, description=#{description}, cover_url=#{coverUrl} WHERE id=#{id}")
     int update(Book book);
 
     @Delete("DELETE FROM book WHERE id = #{id}")
@@ -54,6 +57,9 @@ public interface BookMapper {
 
     @Update("UPDATE book SET rating = #{rating} WHERE id = #{id}")
     int updateRating(@Param("id") Integer id, @Param("rating") BigDecimal rating);
+
+    @Select("SELECT " + BOOK_COLUMNS + " FROM book WHERE category = #{category} ORDER BY borrow_count DESC")
+    List<Book> findByCategory(@Param("category") String category);
 
 }
 

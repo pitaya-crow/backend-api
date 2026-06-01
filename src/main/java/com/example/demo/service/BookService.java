@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.entity.Book;
 import com.example.demo.mapper.BookMapper;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,6 +18,11 @@ public class BookService {
             /** 图书列表 */
             public List<Book> list() {
                 return bookMapper.findALL();
+            }
+
+            /** 按分类查询图书 */
+            public List<Book> listByCategory(String category) {
+                return bookMapper.findByCategory(category);
             }
 
             /** 图书详情 */
@@ -38,6 +44,9 @@ public class BookService {
                 if (book.getAvailable() == null && book.getTotal() != null) {
                     book.setAvailable(book.getTotal());
                 }
+                if (book.getCreateTime() == null) {
+                    book.setCreateTime(LocalDateTime.now());
+                }
                 // rating 由书评汇总，新增时不设置
 
                 bookMapper.insert(book);
@@ -55,24 +64,17 @@ public class BookService {
                     throw new IllegalArgumentException("图书不存在");
                 }
 
-                if (incoming.getTitle() != null) {
-                    existing.setTitle(incoming.getTitle());
-                }
-                if (incoming.getAuthor() != null) {
-                    existing.setAuthor(incoming.getAuthor());
-                }
-                if (incoming.getIsbn() != null) {
-                    existing.setIsbn(incoming.getIsbn());
-                }
-                if (incoming.getTotal() != null) {
-                    existing.setTotal(incoming.getTotal());
-                }
-                if (incoming.getAvailable() != null) {
-                    existing.setAvailable(incoming.getAvailable());
-                }
-                if (incoming.getCreateTime() != null) {
-                    existing.setCreateTime(incoming.getCreateTime());
-                }
+                if (incoming.getTitle() != null) existing.setTitle(incoming.getTitle());
+                if (incoming.getAuthor() != null) existing.setAuthor(incoming.getAuthor());
+                if (incoming.getIsbn() != null) existing.setIsbn(incoming.getIsbn());
+                if (incoming.getTotal() != null) existing.setTotal(incoming.getTotal());
+                if (incoming.getAvailable() != null) existing.setAvailable(incoming.getAvailable());
+                if (incoming.getCreateTime() != null) existing.setCreateTime(incoming.getCreateTime());
+                if (incoming.getCategory() != null) existing.setCategory(incoming.getCategory());
+                if (incoming.getPublisher() != null) existing.setPublisher(incoming.getPublisher());
+                if (incoming.getPublishDate() != null) existing.setPublishDate(incoming.getPublishDate());
+                if (incoming.getDescription() != null) existing.setDescription(incoming.getDescription());
+                if (incoming.getCoverUrl() != null) existing.setCoverUrl(incoming.getCoverUrl());
 
                 bookMapper.update(existing);
                 return existing;

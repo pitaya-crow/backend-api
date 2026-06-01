@@ -13,9 +13,12 @@ public class BookController {
     @Autowired
     private BookService bookService;
     @GetMapping("/list")
-    public Result list(){
-    return Result.success(bookService.list());
-}
+    public Result list(@RequestParam(required = false) String category){
+        if (category != null && !category.isEmpty()) {
+            return Result.success(bookService.listByCategory(category));
+        }
+        return Result.success(bookService.list());
+    }
     @GetMapping ("/{id}")
     public Result getById(@PathVariable Integer id) {
         Book book = bookService.getById(id);

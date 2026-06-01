@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BorrowService {
@@ -96,6 +99,27 @@ public class BorrowService {
     /** 借阅记录列表（管理端等） */
     public List<BorrowRecord> list() {
         return borrowRecordMapper.findAll();
+    }
+
+    /** 按用户ID查借阅记录（含书名） */
+    public List<Map<String, Object>> listByUserId(Integer userId) {
+        List<BorrowRecord> records = borrowRecordMapper.findByUserId(userId);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (BorrowRecord record : records) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", record.getId());
+            map.put("bookId", record.getBookId());
+            map.put("userId", record.getUserId());
+            map.put("borrowedAt", record.getBorrowedAt());
+            map.put("dueAt", record.getDueAt());
+            map.put("returnedAt", record.getReturnedAt());
+            map.put("status", record.getStatus());
+            // 查询书名
+            Book book = bookMapper.findById(record.getBookId());
+            map.put("bookTitle", book != null ? book.getTitle() : "未知");
+            result.add(map);
+        }
+        return result;
     }
 
     /** 按 id 查一条 */

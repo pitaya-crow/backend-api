@@ -18,5 +18,8 @@ import java.time.LocalDateTime;
 
         private LocalDateTime createTime;
         private Integer likeCount;
+
+        /** 非数据库字段，由 Service 层填充（MyBatis 自动忽略无对应列的字段） */
+        private String username;
     }
 
