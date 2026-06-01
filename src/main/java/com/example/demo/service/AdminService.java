@@ -30,6 +30,7 @@ public class AdminService {
         data.put("userCount",userMapper.countUsers());
         data.put("borrowRecordCount",borrowRecordMapper.countBorrowRecords());
         data.put("reviewCount",reviewMapper.countReview());
+        data.put("overdueCount",borrowRecordMapper.countOverdue());
         return data;
     }
     public List<BorrowRecord> getRecentBorrows(){
@@ -74,4 +75,38 @@ public List<Map<String,Object>> getBorrowTrend(){
         return bookMapper.findCategoryStats();
     }
 
+    /** 获取逾期记录（含用户名、书名、欠费） */
+    public List<Map<String, Object>> getOverdueRecords() {
+        List<BorrowRecord> records = borrowRecordMapper.findOverdueRecords();
+        List<Map<String, Object>> result = new java.util.ArrayList<>();
+        double overdueRate = 0.1; // 每天0.1元
+        for (BorrowRecord record : records) {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", record.getId());
+            map.put("bookId", record.getBookId());
+            map.put("userId", record.getUserId());
+            map.put("borrowedAt", record.getBorrowedAt());
+            map.put("dueAt", record.getDueAt());
+            // 查询用户名
+            User user = userMapper.findById(record.getUserId());
+            map.put("userName", user != null ? user.getUserName() : "未知");
+            // 查询书名
+            Book book = bookMapper.findById(record.getBookId());
+            map.put("bookTitle", book != null ? book.getTitle() : "未知");
+            // 计算逾期天数和欠费
+            if (record.getDueAt() != null) {
+                long overdueDays = java.time.temporal.ChronoUnit.DAYS.between(
+                        record.getDueAt(), java.time.LocalDateTime.now());
+                if (overdueDays < 0) overdueDays = 0;
+                double fee = overdueDays * overdueRate;
+                map.put("overdueDays", overdueDays);
+                map.put("fee", Math.round(fee * 10.0) / 10.0);
+            } else {
+                map.put("overdueDays", 0);
+                map.put("fee", 0.0);
+            }
+            result.add(map);
+        }
+        return result;
+    }
 }

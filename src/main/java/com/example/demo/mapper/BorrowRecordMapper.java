@@ -51,6 +51,14 @@ public interface BorrowRecordMapper {
     @Select("SELECT * FROM borrow_record ORDER BY borrowed_at DESC LIMIT 10")
     List<BorrowRecord> findRecentBorrows();
 
+    /** 逾期记录：已借出、超过应还日期、未归还 */
+    @Select("SELECT * FROM borrow_record WHERE status = 1 AND due_at < NOW() AND returned_at IS NULL ORDER BY due_at ASC")
+    List<BorrowRecord> findOverdueRecords();
+
+    /** 逾期数量 */
+    @Select("SELECT COUNT(*) FROM borrow_record WHERE status = 1 AND due_at < NOW() AND returned_at IS NULL")
+    int countOverdue();
+
     /**
      * 借阅趋势（按月）
      * date=月份, borrowCount=当月借出笔数, returnCount=当月借出且已还笔数（课设简化口径）

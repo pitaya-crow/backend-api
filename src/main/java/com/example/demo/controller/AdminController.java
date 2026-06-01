@@ -88,6 +88,18 @@ public class AdminController {
     public Result getCategoryStats(){
         return Result.success(adminService.getCategoryStats());
     }
+
+    @GetMapping("/overdue")
+    public Result getOverdueRecords(){
+        return Result.success(adminService.getOverdueRecords());
+    }
+
+    @PutMapping("/overdue/{id}/clear")
+    public Result clearOverdue(@PathVariable Integer id){
+        BorrowRecord record = new BorrowRecord();
+        record.setId(id);
+        return Result.success(borrowService.returnBook(record));
+    }
     @Autowired
     private BookService bookService;
 
