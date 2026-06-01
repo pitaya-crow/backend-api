@@ -51,6 +51,10 @@ public interface BorrowRecordMapper {
     @Select("SELECT * FROM borrow_record ORDER BY borrowed_at DESC LIMIT 10")
     List<BorrowRecord> findRecentBorrows();
 
+    /** 本周借阅记录 */
+    @Select("SELECT * FROM borrow_record WHERE borrowed_at >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) ORDER BY borrowed_at DESC")
+    List<BorrowRecord> findThisWeekBorrows();
+
     /** 逾期记录：已借出、超过应还日期、未归还 */
     @Select("SELECT * FROM borrow_record WHERE status = 1 AND due_at < NOW() AND returned_at IS NULL ORDER BY due_at ASC")
     List<BorrowRecord> findOverdueRecords();

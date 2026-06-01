@@ -33,8 +33,22 @@ public class AdminService {
         data.put("overdueCount",borrowRecordMapper.countOverdue());
         return data;
     }
-    public List<BorrowRecord> getRecentBorrows(){
-        return borrowRecordMapper.findRecentBorrows();
+    public List<Map<String, Object>> getRecentBorrows(){
+        List<BorrowRecord> records = borrowRecordMapper.findThisWeekBorrows();
+        List<Map<String, Object>> result = new java.util.ArrayList<>();
+        for (BorrowRecord record : records) {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", record.getId());
+            map.put("borrowedAt", record.getBorrowedAt());
+            map.put("returnedAt", record.getReturnedAt());
+            map.put("status", record.getStatus());
+            User user = userMapper.findById(record.getUserId());
+            map.put("userName", user != null ? user.getUserName() : "未知");
+            Book book = bookMapper.findById(record.getBookId());
+            map.put("bookTitle", book != null ? book.getTitle() : "未知");
+            result.add(map);
+        }
+        return result;
     }
 public List<Book> getHotBooks(){
         return bookMapper.getHotBooks();
